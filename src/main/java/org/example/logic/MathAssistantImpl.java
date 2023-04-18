@@ -6,6 +6,7 @@ import org.example.model.Equation;
 import org.example.util.helper.EquationHelper;
 import org.example.util.validators.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,13 +19,15 @@ public class MathAssistantImpl implements MathAssistant {
     private final EquationDao equationDao;
     private final Scanner scanner;
     private final EquationHelper helper;
+    private final ApplicationContext context;
 
     @Autowired
-    public MathAssistantImpl(Validator validator, EquationDao equationDao, Scanner scanner, EquationHelper helper) {
+    public MathAssistantImpl(Validator validator, EquationDao equationDao, Scanner scanner, EquationHelper helper, ApplicationContext context) {
         this.validator = validator;
         this.equationDao = equationDao;
         this.scanner = scanner;
         this.helper = helper;
+        this.context = context;
     }
 
     @Override
@@ -44,7 +47,7 @@ public class MathAssistantImpl implements MathAssistant {
         try {
             String expression = scanner.nextLine();
             if (validator.isValid(expression)) {
-                Equation equation = new Equation();
+                Equation equation = context.getBean("equation", Equation.class);
                 equation.setExpression(expression);
                 equationDao.save(equation);
                 System.out.println("the equation has: " + helper.amountNumbers(equation) + " numbers");
